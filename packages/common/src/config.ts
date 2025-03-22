@@ -1,10 +1,12 @@
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 dotenv.config();
 
 // Loads .env variables into process.env
 
 // Now you can use them
-const JWT_SECRET = process.env.JWT_SECRET;
+console.log("Loaded JWT_SECRET:", process.env.JWT_SECRET);
+
+const JWT_SECRET = process.env.JWT_SECRET || "123123";
 
 console.log("JWT_SECRET:", JWT_SECRET);
 

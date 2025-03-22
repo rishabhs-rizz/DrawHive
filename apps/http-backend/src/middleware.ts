@@ -2,7 +2,7 @@ import JWT_SECRET from "@repo/common/config";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
   id?: string;
 }
 

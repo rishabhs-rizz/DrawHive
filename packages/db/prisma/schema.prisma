@@ -13,15 +13,6 @@ model User {
   name     String
   password String
   photo    String?
-
-
-
-
-
-
-
-
-  
   rooms    Room[]
   chats    Chat[]
 }

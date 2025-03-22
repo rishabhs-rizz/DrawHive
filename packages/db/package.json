@@ -15,7 +15,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "description": "",
   "dependencies": {
     "@prisma/client": "6.5.0",
