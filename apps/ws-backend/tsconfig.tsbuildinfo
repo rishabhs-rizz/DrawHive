@@ -1,1 +1,1 @@
-{"root":["./src/index.ts"],"version":"5.8.2"}
+{"root":["./src/chatinroom.ts","./src/joinroom.ts","./src/leaveroom.ts","./src/index.ts"],"version":"5.8.2"}

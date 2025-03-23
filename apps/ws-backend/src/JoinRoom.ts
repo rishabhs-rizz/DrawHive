@@ -1,78 +1,29 @@
 import { WebSocket, WebSocketServer } from "ws";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import JWT_SECRET from "@repo/common/config";
 import prisma from "@repo/db/prisma";
-import { json } from "stream/consumers";
+import { Uzers } from "./index";
 
-const wss = new WebSocketServer({ port: 8080 });
+export const JoinRoom = async (
+  ws: WebSocket,
+  wss: WebSocketServer,
+  roomId: string,
+  id: string
+) => {
+  const user = Uzers.find((u) => u.ws === ws);
 
-interface User {
-  ws: WebSocket;
-  rooms: string[];
-  id: string;
-}
-
-const Uzers: User[] = [];
-
-function CheckUser(token: string): string | null {
-  const decoded = jwt.verify(token, JWT_SECRET as string);
-
-  if (typeof decoded == "string") {
-    return null;
-  }
-
-  if (!decoded || !(decoded as JwtPayload).id) {
-    return null;
-  }
-
-  return decoded.id;
-}
-
-wss.on("connection", function connection(ws, request) {
-  const url = request.url;
-  if (!url) {
+  if (!user) {
     return;
   }
 
-  const queryParams = new URLSearchParams(url.split("?")[1]);
-  const token = queryParams.get("token") || "";
-  const id = CheckUser(token);
+  const validRoom = await prisma.room.findUnique({
+    where: {
+      id: parseInt(roomId, 10),
+    },
+  });
 
-  if (!id) {
-    ws.send("Unauthorized");
-    ws.close();
+  if (!validRoom) {
+    ws.send(JSON.stringify({ type: "error", message: "Room not found" }));
     return;
   }
 
-  Uzers.push({
-    id,
-    rooms: [],
-    ws,
-  });
-
-  ws.on("message", function message(data) {
-    const parsedData = JSON.parse(data.toString());
-
-    if (parsedData.type === "join") {
-      const room = parsedData.room;
-      const user = Uzers.find((u) => u.id === id);
-
-      if (!user) {
-        return;
-      }
-
-      const validRoom = prisma.room.findUnique({
-        where: {
-          slug: room,
-        },
-      });
-
-      if (!validRoom) {
-        ws.send(JSON.stringify({ type: "error", message: "Room not found" }));
-        return;
-      }
-
-      user.rooms.push(room);
-    }
-  });
-});
+  user.rooms.push(roomId);
+};
