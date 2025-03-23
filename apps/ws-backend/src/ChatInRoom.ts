@@ -1,7 +1,8 @@
 import { WebSocket, WebSocketServer } from "ws";
 import { Uzers } from ".";
+import prisma from "@repo/db/prisma";
 
-export const ChatInRoom = (
+export const ChatInRoom = async (
   ws: WebSocket,
   wss: WebSocketServer,
   message: string,
@@ -9,6 +10,7 @@ export const ChatInRoom = (
   id: string
 ) => {
   const user = Uzers.find((u) => u.ws === ws);
+
   // Check if the user exists and is part of the room
   if (!user || !user.rooms.includes(roomId)) {
     ws.send(
@@ -19,6 +21,16 @@ export const ChatInRoom = (
     );
     return;
   }
+
+  // Save the message to the database
+  const chat = await prisma.chat.create({
+    data: {
+      message,
+      userId: id,
+      roomID: parseInt(roomId, 10),
+      timestamp: new Date(),
+    },
+  });
 
   Uzers.forEach((u) => {
     if (u.rooms.includes(roomId)) {
