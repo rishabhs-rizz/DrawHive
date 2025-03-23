@@ -85,4 +85,30 @@ app.post(
   }
 );
 
+app.get(
+  "/chats/:roomId",
+  auth_middleWare,
+  async (req: AuthRequest, res: Response) => {
+    const roomId = req.params.roomId;
+
+    try {
+      if (roomId && req.id) {
+        const chats = await prisma.chat.findMany({
+          where: {
+            roomID: parseInt(roomId, 10),
+          },
+          orderBy: {
+            id: "desc",
+          },
+          take: 50,
+        });
+        res.json(chats);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(400).send("Invalid room ID");
+    }
+  }
+);
+
 app.listen(5000);
