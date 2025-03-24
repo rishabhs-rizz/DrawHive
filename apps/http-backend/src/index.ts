@@ -111,4 +111,26 @@ app.get(
   }
 );
 
+app.get(
+  "/room/:slug",
+  auth_middleWare,
+  async (req: AuthRequest, res: Response) => {
+    const slug = req.params.slug;
+
+    try {
+      if (slug && req.id) {
+        const requiredRoom = await prisma.room.findFirst({
+          where: {
+            slug: slug,
+          },
+        });
+        res.json(requiredRoom);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(400).send("Invalid room ID");
+    }
+  }
+);
+
 app.listen(5000);
