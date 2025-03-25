@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [RoomId, setRoomId] = useState("");
+  const [slug, setSlug] = useState("");
   const router = useRouter();
 
   return (
@@ -19,19 +19,19 @@ export default function Home() {
       }}
     >
       <input
-        style={{ padding: "10" }}
-        value={RoomId}
+        style={{ padding: "3vh" }}
+        value={slug}
         onChange={(e) => {
-          setRoomId(e.target.value);
+          setSlug(e.target.value);
         }}
         type="text"
         placeholder="Room Id"
       />
 
       <button
-        style={{ padding: "10" }}
+        style={{ padding: "3vh" }}
         onClick={() => {
-          router.push(`/room/${RoomId}`);
+          router.push(`/room/${slug}`);
         }}
       >
         c'mon Join room
