@@ -48,7 +48,7 @@ export function Authpage({ isSignin }: { isSignin: boolean }) {
               className="text-blue-500 cursor-pointer hover:underline"
               onClick={() => {
                 router.push(
-                  `http://localhost:5000/${isSignin ? "signup" : "signin"}`
+                  `http://localhost:5000/${isSignin ? "signin" : "sign"}`
                 );
               }}
             >
