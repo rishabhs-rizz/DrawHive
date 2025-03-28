@@ -20,6 +20,9 @@ importers:
 
   apps/drawhive-frontend:
     dependencies:
+      axios:
+        specifier: ^1.8.4
+        version: 1.8.4
       next:
         specifier: 15.2.4
         version: 15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
