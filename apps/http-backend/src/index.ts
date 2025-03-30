@@ -5,9 +5,17 @@ import jwt from "jsonwebtoken";
 import JWT_SECRET from "@repo/common/config";
 import auth_middleWare from "./middleware";
 import { AuthRequest } from "./middleware";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Replace with frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.post("/signup", async (req: Request, res: Response) => {
   try {
@@ -85,31 +93,28 @@ app.post(
   }
 );
 
-app.get(
-  "/chats/:roomId",
-  auth_middleWare,
-  async (req: AuthRequest, res: Response) => {
-    const roomId = req.params.roomId;
+app.get("/chats/:roomId", async (req: AuthRequest, res: Response) => {
+  console.log("req is coming");
+  const roomId = req.params.roomId;
 
-    try {
-      if (roomId && req.id) {
-        const chats = await prisma.chat.findMany({
-          where: {
-            roomID: parseInt(roomId, 10),
-          },
-          orderBy: {
-            id: "desc",
-          },
-          take: 50,
-        });
-        res.json(chats);
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(400).send("Invalid room ID");
+  try {
+    if (roomId) {
+      const chats = await prisma.chat.findMany({
+        where: {
+          roomID: parseInt(roomId, 10),
+        },
+        orderBy: {
+          id: "desc",
+        },
+        take: 50,
+      });
+      res.json({ chats });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Invalid room ID");
   }
-);
+});
 
 app.get(
   "/room/:slug",
