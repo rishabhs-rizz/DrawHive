@@ -1,5 +1,3 @@
-"use client";
-
 import { RoomCanvas } from "@/Components/RoomCanvas";
 
 export default async function CanvasPage({

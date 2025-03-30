@@ -12,6 +12,7 @@ export function Canvas({
 
   useEffect(() => {
     if (canvasref.current) {
+      console.log("canvas");
       initDraw(canvasref.current, roomId, socket);
     }
   }, [canvasref]);

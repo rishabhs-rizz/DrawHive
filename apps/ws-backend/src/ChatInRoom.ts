@@ -34,7 +34,7 @@ export const ChatInRoom = async (
 
   Uzers.forEach((u) => {
     if (u.rooms.includes(roomId)) {
-      u.ws.send(JSON.stringify({ type: "message", message, roomId }));
+      u.ws.send(JSON.stringify({ type: "chat", message, roomId }));
     }
   });
 };

@@ -51,9 +51,9 @@ wss.on("connection", function connection(ws, request) {
     ws,
   });
 
-  ws.on("message", function incoming(message) {
+  ws.on("message", function incoming(message: string) {
     try {
-      const ParsedData = JSON.parse(message.toString());
+      const ParsedData = JSON.parse(message);
 
       if (!ParsedData.type) {
         ws.send("Type Required");
