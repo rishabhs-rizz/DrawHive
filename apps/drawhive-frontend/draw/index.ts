@@ -20,23 +20,22 @@ export async function initDraw(
   roomId: string,
   socket: WebSocket
 ) {
+  console.log("aagaya");
   const ctx = canvas?.getContext("2d");
+  console.log(ctx);
 
-  let existingShapes: Shape[] = await getExistingShapes(roomId);
+  let existingShapes: Shape[] = [];
+
+  try {
+    existingShapes = await getExistingShapes(roomId);
+    console.log("Existing shapes:", existingShapes);
+  } catch (e) {
+    console.error("Error fetching existing shapes:", e);
+  }
 
   if (!ctx) {
     return;
   }
-
-  socket.onmessage = (event) => {
-    const parsedData = JSON.parse(event.data);
-
-    if (parsedData.type == "chat") {
-      const parsedShape = JSON.parse(parsedData.message);
-      existingShapes.push(parsedShape);
-      clearCanvas(existingShapes, canvas, ctx);
-    }
-  };
 
   clearCanvas(existingShapes, canvas, ctx);
 
@@ -46,6 +45,7 @@ export async function initDraw(
 
   canvas?.addEventListener("mousedown", (e) => {
     clicked = true;
+    const rect = canvas.getBoundingClientRect();
     startX = e.clientX;
     startY = e.clientY;
   });
@@ -66,12 +66,25 @@ export async function initDraw(
     socket.send(
       JSON.stringify({
         type: "chat",
-        message: JSON.stringify({
-          shape,
-        }),
+        message: JSON.stringify(shape),
+        roomId,
       })
     );
   });
+
+  socket.onmessage = (event) => {
+    const parsedData = JSON.parse(event.data);
+    console.log(parsedData.type);
+
+    if (parsedData.type === "chat") {
+      const parsedShape = JSON.parse(parsedData.message);
+
+      console.log("Parsed Shape:", parsedShape);
+
+      existingShapes.push(parsedShape);
+      clearCanvas(existingShapes, canvas, ctx);
+    }
+  };
 
   canvas?.addEventListener("mousemove", (e) => {
     if (clicked) {
@@ -103,13 +116,20 @@ function clearCanvas(
 }
 
 async function getExistingShapes(roomId: string) {
-  const res = await axios.get(`http://localhost:5000/chats/${roomId}`);
-  const data = res.data.chats;
+  console.log("Fetching shapes for roomId:", roomId);
+  try {
+    const res = await axios.get(`http://localhost:5000/chats/${roomId}`);
+    const data = res.data.chats || [];
+    console.log(res.data.chats);
 
-  const shapes = data.map((x: { message: string }) => {
-    const messageData = JSON.parse(x.message);
-    return messageData;
-  });
+    const shapes = data.map((x: { message: string }) => {
+      const messageData = JSON.parse(x.message);
+      return messageData;
+    });
 
-  return shapes;
+    return shapes;
+  } catch (e) {
+    console.error("Error in getExistingShapes:", e);
+    return [];
+  }
 }
