@@ -1,5 +1,6 @@
 import { initDraw } from "@/draw";
 import { useEffect, useRef } from "react";
+import TopBar from "./TopBar";
 
 export function Canvas({
   roomId,
@@ -18,8 +19,13 @@ export function Canvas({
   }, [canvasref]);
 
   return (
-    <div>
-      <canvas ref={canvasref} width={2000} height={2000}></canvas>
+    <div className="h-[100vh] overflow-hidden ">
+      <canvas
+        ref={canvasref}
+        width={window.innerWidth}
+        height={window.innerHeight}
+      ></canvas>
+      <TopBar />
     </div>
   );
 }
