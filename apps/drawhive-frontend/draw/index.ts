@@ -20,15 +20,12 @@ export async function initDraw(
   roomId: string,
   socket: WebSocket
 ) {
-  console.log("aagaya");
   const ctx = canvas?.getContext("2d");
-  console.log(ctx);
 
   let existingShapes: Shape[] = [];
 
   try {
     existingShapes = await getExistingShapes(roomId);
-    console.log("Existing shapes:", existingShapes);
   } catch (e) {
     console.error("Error fetching existing shapes:", e);
   }
@@ -42,10 +39,11 @@ export async function initDraw(
   let clicked = false;
   let startX = 0;
   let startY = 0;
+  // @ts-ignore
+  let selectedTool = window.selectedTool || "rect";
 
   canvas?.addEventListener("mousedown", (e) => {
     clicked = true;
-    const rect = canvas.getBoundingClientRect();
     startX = e.clientX;
     startY = e.clientY;
   });

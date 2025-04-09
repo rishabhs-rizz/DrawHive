@@ -1,5 +1,5 @@
 import { initDraw } from "@/draw";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import TopBar from "./TopBar";
 
 export type Tool = "circle" | "rect" | "pencil" | "eraser";
@@ -12,10 +12,13 @@ export function Canvas({
   socket: WebSocket;
 }) {
   const canvasref = useRef<HTMLCanvasElement>(null);
+  const [selectedTool, SetselectedTool] = useState<Tool>("rect");
 
   useEffect(() => {
     if (canvasref.current) {
       console.log("canvas");
+      //@ts-ignore
+      window.selectedTool = selectedTool;
       initDraw(canvasref.current, roomId, socket);
     }
   }, [canvasref]);
@@ -27,7 +30,7 @@ export function Canvas({
         width={window.innerWidth}
         height={window.innerHeight}
       ></canvas>
-      <TopBar />
+      <TopBar selectedTool={selectedTool} SetselectedTool={SetselectedTool} />
     </div>
   );
 }

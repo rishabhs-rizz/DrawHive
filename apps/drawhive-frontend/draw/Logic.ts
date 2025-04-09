@@ -48,7 +48,7 @@ export class Logic {
     this.initMouseHandlers();
   }
 
-  setShape(tool: Tool) {
+  setTool(tool: Tool) {
     this.selectedTool = tool;
   }
 
