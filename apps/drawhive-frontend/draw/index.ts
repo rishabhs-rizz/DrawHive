@@ -10,11 +10,14 @@ type Shape =
     }
   | {
       type: "circle";
-      centerx: number;
-      centery: number;
-      radius: number;
+      x: number;
+      y: number;
+      radiusX: number;
+      radiusY: number;
+      rotation: number;
+      startAngle: number;
+      endAngle: number;
     };
-
 export async function initDraw(
   canvas: HTMLCanvasElement,
   roomId: string,
@@ -36,11 +39,15 @@ export async function initDraw(
 
   clearCanvas(existingShapes, canvas, ctx);
 
-  let clicked = false;
-  let startX = 0;
-  let startY = 0;
+  let endX: number;
+  let endY: number;
+  let startX: number;
+  let startY: number;
+  let clicked: boolean = false;
+  let width: number;
+  let height: number;
   // @ts-ignore
-  let selectedTool = window.selectedTool || "rect";
+  const selectedTool = window.selectedTool || "rect";
 
   canvas?.addEventListener("mousedown", (e) => {
     clicked = true;
@@ -52,13 +59,33 @@ export async function initDraw(
     clicked = false;
     const width = e.clientX - startX;
     const height = e.clientY - startY;
-    const shape: Shape = {
-      type: "rect",
-      x: startX,
-      y: startY,
-      height,
-      width,
-    };
+    let shape: Shape | null = null;
+    if (selectedTool === "rect") {
+      const rect = canvas.getBoundingClientRect();
+      startX = e.clientX - rect.left;
+      startY = e.clientY - rect.top;
+      shape = {
+        type: "rect",
+        x: startX,
+        y: startY,
+        width: width,
+        height: height,
+      };
+    } else if (selectedTool === "circle") {
+      const radius = Math.sqrt(width * width + height * height) / 2;
+      shape = {
+        type: "circle",
+        x: startX + width / 2,
+        y: startY + height / 2,
+        radiusX: Math.abs(width) / 2,
+        radiusY: Math.abs(height) / 2,
+        rotation: 0,
+        startAngle: 0,
+        endAngle: 2 * Math.PI,
+      };
+    } else {
+      return; // Invalid tool, do nothing
+    }
     existingShapes.push(shape);
 
     socket.send(
@@ -85,13 +112,66 @@ export async function initDraw(
   };
 
   canvas?.addEventListener("mousemove", (e) => {
-    if (clicked) {
-      const width = e.clientX - startX;
-      const height = e.clientY - startY;
+    if (clicked && socket) {
+      endX = e.clientX;
+      endY = e.clientY;
+      width = endX - startX;
+      height = endY - startY;
+      // @ts-ignore
+      const selectedTool = window.selectedTool;
+      if (selectedTool === "rect") {
+        const width = e.clientX - startX;
+        const height = e.clientY - startY;
 
-      clearCanvas(existingShapes, canvas, ctx);
-      ctx.strokeStyle = "rgba(255, 255, 255)";
-      ctx.strokeRect(startX, startY, width, height);
+        clearCanvas(existingShapes, canvas, ctx);
+        ctx.strokeStyle = "rgba(255, 255, 255)";
+
+        ctx.strokeRect(startX, startY, width, height);
+      } else if (selectedTool === "circle") {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0,0,0)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        clearCanvas(existingShapes, canvas, ctx);
+
+        ctx.beginPath();
+        ctx.ellipse(
+          startX + width / 2,
+          startY + height / 2,
+          Math.abs(width) / 2,
+          Math.abs(height) / 2,
+          0,
+          0,
+          2 * Math.PI
+        );
+        ctx.strokeStyle = "rgba(255,255,255)";
+        ctx.stroke();
+        // } else if (selectedTool === "circle") {
+        //   const rect = canvas.getBoundingClientRect();
+        //   const currentX = e.clientX - rect.left;
+        //   const currentY = e.clientY - rect.top;
+
+        //   const width = currentX - startX;
+        //   const height = currentY - startY;
+        //   const size = Math.min(Math.abs(width), Math.abs(height)); // make it a circle (equal sides)
+
+        //   // Adjust circle start point depending on drag direction
+        //   const offsetX = width < 0 ? -size : 0;
+        //   const offsetY = height < 0 ? -size : 0;
+
+        //   // Clear canvas for preview
+        //   clearCanvas(existingShapes, canvas, ctx);
+        //   ctx.strokeStyle = "rgba(255, 255, 255)";
+
+        //   ctx.beginPath();
+        //   ctx.arc(
+        //     startX + offsetX + size / 2,
+        //     startY + offsetY + size / 2,
+        //     size / 2,
+        //     0,
+        //     2 * Math.PI
+        //   );
+        //   ctx.stroke();
+      }
     }
   });
 }
@@ -109,6 +189,20 @@ function clearCanvas(
     if (shape.type === "rect") {
       ctx.strokeStyle = "rgba(255, 255, 255)";
       ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+    } else if (shape.type === "circle") {
+      ctx.strokeStyle = "rgba(255, 255, 255)";
+      ctx.beginPath();
+      ctx.ellipse(
+        shape.x,
+        shape.y,
+        shape.radiusX,
+        shape.radiusY,
+        shape.rotation,
+        shape.startAngle,
+        shape.endAngle
+      );
+      ctx.stroke();
+      ctx.closePath();
     }
   });
 }

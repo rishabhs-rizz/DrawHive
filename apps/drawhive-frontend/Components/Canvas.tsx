@@ -15,10 +15,13 @@ export function Canvas({
   const [selectedTool, SetselectedTool] = useState<Tool>("rect");
 
   useEffect(() => {
+    // @ts-ignore
+    window.selectedTool = selectedTool;
+  }, [selectedTool]);
+
+  useEffect(() => {
     if (canvasref.current) {
       console.log("canvas");
-      //@ts-ignore
-      window.selectedTool = selectedTool;
       initDraw(canvasref.current, roomId, socket);
     }
   }, [canvasref]);
