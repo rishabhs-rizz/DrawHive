@@ -1,4 +1,12 @@
-import { Circle, Eraser, Pencil, RectangleHorizontal } from "lucide-react";
+import {
+  Circle,
+  Eraser,
+  LineChart,
+  Pencil,
+  PenLine,
+  RectangleHorizontal,
+  Slash,
+} from "lucide-react";
 import { IconsButtons } from "./IconsButtons";
 import { useState } from "react";
 import { Tool } from "./Canvas";
@@ -18,6 +26,15 @@ export default function TopBar({
           icons={<Pencil />}
           onClick={() => {
             SetselectedTool("pencil");
+          }}
+        ></IconsButtons>
+      }
+      {
+        <IconsButtons
+          activated={selectedTool === "line"}
+          icons={<Slash />}
+          onClick={() => {
+            SetselectedTool("line");
           }}
         ></IconsButtons>
       }

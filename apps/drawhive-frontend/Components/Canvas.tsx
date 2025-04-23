@@ -2,7 +2,7 @@ import { initDraw } from "@/draw";
 import { useEffect, useRef, useState } from "react";
 import TopBar from "./TopBar";
 
-export type Tool = "circle" | "rect" | "pencil" | "eraser";
+export type Tool = "circle" | "rect" | "line" | "eraser" | "pencil";
 
 export function Canvas({
   roomId,

@@ -17,7 +17,15 @@ type Shape =
       rotation: number;
       startAngle: number;
       endAngle: number;
+    }
+  | {
+      type: "line";
+      x: number;
+      y: number;
+      endX: number;
+      endY: number;
     };
+
 export async function initDraw(
   canvas: HTMLCanvasElement,
   roomId: string,
@@ -88,6 +96,18 @@ export async function initDraw(
         ctx.strokeStyle = "rgba(255,255,255)";
         ctx.stroke();
         ctx.closePath();
+      } else if (selectedTool === "line") {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0,0,0)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        clearCanvas(existingShapes, canvas, ctx);
+
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = "rgba(255,255,255)";
+        ctx.stroke();
+        ctx.closePath();
       }
     }
   });
@@ -117,8 +137,16 @@ export async function initDraw(
         startAngle: 0,
         endAngle: 2 * Math.PI,
       };
+    } else if (selectedTool === "line") {
+      shape = {
+        type: "line",
+        x: startX,
+        y: startY,
+        endX: endX,
+        endY: endY,
+      };
     } else {
-      return; // Skip unsupported tools like eraser or pencil
+      return;
     }
 
     console.log("Shape to send:", shape);
@@ -172,6 +200,13 @@ function clearCanvas(
         shape.startAngle,
         shape.endAngle
       );
+      ctx.stroke();
+      ctx.closePath();
+    } else if (shape.type === "line") {
+      ctx.strokeStyle = "rgba(255, 255, 255)";
+      ctx.beginPath();
+      ctx.moveTo(shape.x, shape.y);
+      ctx.lineTo(shape.endX, shape.endY);
       ctx.stroke();
       ctx.closePath();
     }
