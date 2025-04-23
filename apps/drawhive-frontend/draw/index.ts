@@ -46,70 +46,12 @@ export async function initDraw(
   let clicked: boolean = false;
   let width: number;
   let height: number;
-  // @ts-ignore
-  const selectedTool = window.selectedTool || "rect";
 
   canvas?.addEventListener("mousedown", (e) => {
     clicked = true;
     startX = e.clientX;
     startY = e.clientY;
   });
-
-  canvas?.addEventListener("mouseup", (e) => {
-    clicked = false;
-    const width = e.clientX - startX;
-    const height = e.clientY - startY;
-    let shape: Shape | null = null;
-    if (selectedTool === "rect") {
-      const rect = canvas.getBoundingClientRect();
-      startX = e.clientX - rect.left;
-      startY = e.clientY - rect.top;
-      shape = {
-        type: "rect",
-        x: startX,
-        y: startY,
-        width: width,
-        height: height,
-      };
-    } else if (selectedTool === "circle") {
-      const radius = Math.sqrt(width * width + height * height) / 2;
-      shape = {
-        type: "circle",
-        x: startX + width / 2,
-        y: startY + height / 2,
-        radiusX: Math.abs(width) / 2,
-        radiusY: Math.abs(height) / 2,
-        rotation: 0,
-        startAngle: 0,
-        endAngle: 2 * Math.PI,
-      };
-    } else {
-      return; // Invalid tool, do nothing
-    }
-    existingShapes.push(shape);
-
-    socket.send(
-      JSON.stringify({
-        type: "chat",
-        message: JSON.stringify(shape),
-        roomId,
-      })
-    );
-  });
-
-  socket.onmessage = (event) => {
-    const parsedData = JSON.parse(event.data);
-    console.log(parsedData.type);
-
-    if (parsedData.type === "chat") {
-      const parsedShape = JSON.parse(parsedData.message);
-
-      console.log("Parsed Shape:", parsedShape);
-
-      existingShapes.push(parsedShape);
-      clearCanvas(existingShapes, canvas, ctx);
-    }
-  };
 
   canvas?.addEventListener("mousemove", (e) => {
     if (clicked && socket) {
@@ -145,35 +87,64 @@ export async function initDraw(
         );
         ctx.strokeStyle = "rgba(255,255,255)";
         ctx.stroke();
-        // } else if (selectedTool === "circle") {
-        //   const rect = canvas.getBoundingClientRect();
-        //   const currentX = e.clientX - rect.left;
-        //   const currentY = e.clientY - rect.top;
-
-        //   const width = currentX - startX;
-        //   const height = currentY - startY;
-        //   const size = Math.min(Math.abs(width), Math.abs(height)); // make it a circle (equal sides)
-
-        //   // Adjust circle start point depending on drag direction
-        //   const offsetX = width < 0 ? -size : 0;
-        //   const offsetY = height < 0 ? -size : 0;
-
-        //   // Clear canvas for preview
-        //   clearCanvas(existingShapes, canvas, ctx);
-        //   ctx.strokeStyle = "rgba(255, 255, 255)";
-
-        //   ctx.beginPath();
-        //   ctx.arc(
-        //     startX + offsetX + size / 2,
-        //     startY + offsetY + size / 2,
-        //     size / 2,
-        //     0,
-        //     2 * Math.PI
-        //   );
-        //   ctx.stroke();
+        ctx.closePath();
       }
     }
   });
+
+  canvas?.addEventListener("mouseup", (e) => {
+    clicked = false;
+    let shape: Shape | null = null;
+    // @ts-ignore
+    const selectedTool = window.selectedTool;
+
+    if (selectedTool === "rect") {
+      shape = {
+        type: "rect",
+        x: startX,
+        y: startY,
+        width: width,
+        height: height,
+      };
+    } else if (selectedTool === "circle") {
+      shape = {
+        type: "circle",
+        x: startX + width / 2,
+        y: startY + height / 2,
+        radiusX: Math.abs(width) / 2,
+        radiusY: Math.abs(height) / 2,
+        rotation: 0,
+        startAngle: 0,
+        endAngle: 2 * Math.PI,
+      };
+    } else {
+      return; // Skip unsupported tools like eraser or pencil
+    }
+
+    console.log("Shape to send:", shape);
+
+    socket.send(
+      JSON.stringify({
+        type: "chat",
+        message: JSON.stringify(shape),
+        roomId,
+      })
+    );
+  });
+
+  socket.onmessage = (event) => {
+    const parsedData = JSON.parse(event.data);
+    console.log(parsedData.type);
+
+    if (parsedData.type === "chat") {
+      const parsedShape = JSON.parse(parsedData.message);
+
+      console.log("Parsed Shape:", parsedShape);
+
+      existingShapes.push(parsedShape);
+      clearCanvas(existingShapes, canvas, ctx);
+    }
+  };
 }
 
 function clearCanvas(

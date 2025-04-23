@@ -8,7 +8,7 @@ export function RoomCanvas({ roomId }: { roomId: string }) {
 
   useEffect(() => {
     const ws = new WebSocket(
-      "ws://localhost:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFmNGM0N2Y4LWYyYWEtNGQzMS04N2I4LTJlNDdhNmViMjA0OCIsImlhdCI6MTc0NDE5MzUyNn0.clVhIFQbC0RkIlocOCAVOUEf82Mztoarnp9jxGOdkM0"
+      "ws://localhost:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIwN2JjMjY3LWY5Y2EtNDg3ZC04MDYxLTViZTIyMDM3OTRmOCIsImlhdCI6MTc0NTM5MzQ1NX0.tbVxJxT5BFbj8JQP9huNg4PrnNvqsXa205Iocfsd-ZY"
     );
 
     ws.onopen = () => {
