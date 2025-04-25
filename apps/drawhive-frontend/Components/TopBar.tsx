@@ -6,6 +6,7 @@ import {
   PenLine,
   RectangleHorizontal,
   Slash,
+  Type,
 } from "lucide-react";
 import { IconsButtons } from "./IconsButtons";
 import { useState } from "react";
@@ -35,6 +36,15 @@ export default function TopBar({
           icons={<Slash />}
           onClick={() => {
             SetselectedTool("line");
+          }}
+        ></IconsButtons>
+      }
+      {
+        <IconsButtons
+          activated={selectedTool === "text"}
+          icons={<Type />}
+          onClick={() => {
+            SetselectedTool("text");
           }}
         ></IconsButtons>
       }

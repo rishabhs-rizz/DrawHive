@@ -24,6 +24,19 @@ type Shape =
       y: number;
       endX: number;
       endY: number;
+    }
+  | {
+      type: "text";
+      inputText: string;
+      startX: number;
+      startY: number;
+    }
+  | {
+      type: "pencil";
+      startX: number;
+      startY: number;
+      endX: number;
+      endY: number;
     };
 
 export async function initDraw(
@@ -108,6 +121,49 @@ export async function initDraw(
         ctx.strokeStyle = "rgba(255,255,255)";
         ctx.stroke();
         ctx.closePath();
+      } else if (selectedTool === "text") {
+        ctx.font = "24px sans-serif";
+        ctx.fillStyle = "black";
+
+        let inputText = "";
+
+        // Initial render
+        draw();
+
+        // Listen to keypresses
+        document.addEventListener("keydown", function (e) {
+          // Handle backspace
+          if (e.key === "Backspace") {
+            e.preventDefault();
+            inputText = inputText.slice(0, -1);
+          } else if (e.key.length === 1) {
+            inputText += e.key;
+          }
+          draw();
+        });
+
+        function draw() {
+          // Clear canvas
+          ctx?.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw text
+          ctx?.fillText(inputText, startX, startY);
+        }
+      } else if (selectedTool === "pencil") {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0,0,0)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        clearCanvas(existingShapes, canvas, ctx);
+
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = "#ccc";
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.closePath();
       }
     }
   });
@@ -145,10 +201,22 @@ export async function initDraw(
         endX: endX,
         endY: endY,
       };
-    } else {
-      return;
+    } else if (selectedTool === "text") {
+      shape = {
+        type: "text",
+        inputText: "",
+        startX: startX,
+        startY: startY,
+      };
+    } else if (selectedTool === "pencil") {
+      shape = {
+        type: "pencil",
+        startX: startX,
+        startY: startY,
+        endX: endX,
+        endY: endY,
+      };
     }
-
     console.log("Shape to send:", shape);
 
     socket.send(
@@ -184,7 +252,7 @@ function clearCanvas(
   ctx.fillStyle = "rgba(0, 0, 0)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  existingShapes.map((shape) => {
+  existingShapes.filter(Boolean).forEach((shape) => {
     if (shape.type === "rect") {
       ctx.strokeStyle = "rgba(255, 255, 255)";
       ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
@@ -209,6 +277,11 @@ function clearCanvas(
       ctx.lineTo(shape.endX, shape.endY);
       ctx.stroke();
       ctx.closePath();
+    } else if (shape.type === "text") {
+      ctx.fillStyle = "rgba(255, 255, 255)";
+      ctx.font = "20px Arial";
+      ctx.fillText(shape.inputText, shape.startX, shape.startY);
+    } else if (shape.type === "pencil") {
     }
   });
 }
