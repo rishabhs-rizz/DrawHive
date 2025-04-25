@@ -33,10 +33,7 @@ type Shape =
     }
   | {
       type: "pencil";
-      startX: number;
-      startY: number;
-      endX: number;
-      endY: number;
+      points: { x: number; y: number }[];
     };
 
 export async function initDraw(
@@ -68,10 +65,24 @@ export async function initDraw(
   let width: number;
   let height: number;
 
+  let isDrawing = false;
+  let points: { x: number; y: number }[] = [];
+
+  ctx.strokeStyle = "rgba(255, 255, 255)";
+  ctx.lineWidth = 2;
+
   canvas?.addEventListener("mousedown", (e) => {
     clicked = true;
     startX = e.clientX;
     startY = e.clientY;
+
+    // @ts-ignore
+    const selectedTool = window.selectedTool;
+
+    if (selectedTool === "pencil") {
+      isDrawing = true;
+      points = [{ x: e.offsetX, y: e.offsetY }];
+    }
   });
 
   canvas?.addEventListener("mousemove", (e) => {
@@ -82,6 +93,7 @@ export async function initDraw(
       height = endY - startY;
       // @ts-ignore
       const selectedTool = window.selectedTool;
+
       if (selectedTool === "rect") {
         const width = e.clientX - startX;
         const height = e.clientY - startY;
@@ -150,20 +162,16 @@ export async function initDraw(
           ctx?.fillText(inputText, startX, startY);
         }
       } else if (selectedTool === "pencil") {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(0,0,0)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        clearCanvas(existingShapes, canvas, ctx);
-
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.strokeStyle = "#ccc";
-        ctx.lineJoin = "round";
-        ctx.lineCap = "round";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.closePath();
+        if (isDrawing && selectedTool === "pencil") {
+          points.push({ x: e.offsetX, y: e.offsetY });
+          ctx.beginPath();
+          ctx.moveTo(points[points.length - 2].x, points[points.length - 2].y);
+          ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+          ctx.strokeStyle = "rgba(255, 255, 255)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.closePath();
+        }
       }
     }
   });
@@ -209,23 +217,34 @@ export async function initDraw(
         startY: startY,
       };
     } else if (selectedTool === "pencil") {
-      shape = {
-        type: "pencil",
-        startX: startX,
-        startY: startY,
-        endX: endX,
-        endY: endY,
-      };
+      isDrawing = false;
+      if (points.length > 0) {
+        shape = {
+          type: "pencil",
+          points: [...points],
+        };
+        existingShapes.push(shape);
+      }
     }
-    console.log("Shape to send:", shape);
 
-    socket.send(
-      JSON.stringify({
-        type: "chat",
-        message: JSON.stringify(shape),
-        roomId,
-      })
-    );
+    if (shape) {
+      socket.send(
+        JSON.stringify({
+          type: "chat",
+          message: JSON.stringify(shape),
+          roomId,
+        })
+      );
+    }
+  });
+
+  canvas?.addEventListener("mouseout", () => {
+    // @ts-ignore
+    const selectedTool = window.selectedTool;
+
+    if (selectedTool === "pencil") {
+      isDrawing = false;
+    }
   });
 
   socket.onmessage = (event) => {
@@ -282,6 +301,19 @@ function clearCanvas(
       ctx.font = "20px Arial";
       ctx.fillText(shape.inputText, shape.startX, shape.startY);
     } else if (shape.type === "pencil") {
+      if (shape.points && shape.points.length > 1) {
+        ctx.strokeStyle = "rgba(255, 255, 255)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        shape.points.forEach((point, index) => {
+          if (index === 0) {
+            ctx.moveTo(point.x, point.y);
+          } else {
+            ctx.lineTo(point.x, point.y);
+          }
+        });
+        ctx.stroke();
+      }
     }
   });
 }

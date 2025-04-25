@@ -1,0 +1,35 @@
+
+
+<canvas id="drawCanvas" width="800" height="500" style="border:1px solid #444; background-color: #111;"></canvas>
+
+<script>
+  const canvas = document.getElementById("drawCanvas");
+  const ctx = canvas.getContext("2d");
+
+  let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  // Set stroke style (white, smooth line)
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 2;
+
+  canvas.addEventListener("mousedown", (e) => {
+    drawing = true;
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+  });
+
+  canvas.addEventListener("mousemove", (e) => {
+    if (!drawing) return;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+  });
+
+  canvas.addEventListener("mouseup", () => drawing = false);
+  canvas.addEventListener("mouseout", () => drawing = false);
+</script>
