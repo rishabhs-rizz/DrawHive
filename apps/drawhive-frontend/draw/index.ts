@@ -1,6 +1,7 @@
 import axios from "axios";
+import { handleText } from "./HandleText";
 
-type Shape =
+export type Shape =
   | {
       type: "rect";
       x: number;
@@ -134,33 +135,10 @@ export async function initDraw(
         ctx.stroke();
         ctx.closePath();
       } else if (selectedTool === "text") {
-        ctx.font = "24px sans-serif";
-        ctx.fillStyle = "black";
-
-        let inputText = "";
-
-        // Initial render
-        draw();
-
-        // Listen to keypresses
-        document.addEventListener("keydown", function (e) {
-          // Handle backspace
-          if (e.key === "Backspace") {
-            e.preventDefault();
-            inputText = inputText.slice(0, -1);
-          } else if (e.key.length === 1) {
-            inputText += e.key;
-          }
-          draw();
-        });
-
-        function draw() {
-          // Clear canvas
-          ctx?.clearRect(0, 0, canvas.width, canvas.height);
-
-          // Draw text
-          ctx?.fillText(inputText, startX, startY);
-        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0,0,0)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        clearCanvas(existingShapes, canvas, ctx);
       } else if (selectedTool === "pencil") {
         if (isDrawing && selectedTool === "pencil") {
           points.push({ x: e.offsetX, y: e.offsetY });
@@ -210,12 +188,19 @@ export async function initDraw(
         endY: endY,
       };
     } else if (selectedTool === "text") {
-      shape = {
-        type: "text",
-        inputText: "",
-        startX: startX,
-        startY: startY,
-      };
+      const input = document.createElement("input");
+      input.type = "text";
+      input.style.position = "fixed";
+      input.style.left = `${startX}px`;
+      input.style.top = `${startY}px`;
+      input.style.border = "none";
+      input.style.outline = "none";
+      input.style.color = "white";
+      input.style.width = "400px";
+      input.onkeydown = (event) =>
+        handleText(event, startX, startY, ctx, existingShapes, roomId, socket);
+      document.body.appendChild(input);
+      input.focus();
     } else if (selectedTool === "pencil") {
       isDrawing = false;
       if (points.length > 0) {
@@ -297,8 +282,9 @@ function clearCanvas(
       ctx.stroke();
       ctx.closePath();
     } else if (shape.type === "text") {
-      ctx.fillStyle = "rgba(255, 255, 255)";
-      ctx.font = "20px Arial";
+      ctx.strokeStyle = "white";
+      ctx.font = "24px Arial";
+      ctx.fillStyle = "white";
       ctx.fillText(shape.inputText, shape.startX, shape.startY);
     } else if (shape.type === "pencil") {
       if (shape.points && shape.points.length > 1) {
