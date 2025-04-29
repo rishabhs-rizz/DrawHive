@@ -29,8 +29,8 @@ export type Shape =
   | {
       type: "text";
       inputText: string;
-      startX: number;
-      startY: number;
+      x: number;
+      y: number;
     }
   | {
       type: "pencil";
@@ -150,6 +150,95 @@ export async function initDraw(
           ctx.stroke();
           ctx.closePath();
         }
+      } else if (selectedTool === "eraser" && clicked) {
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
+
+        existingShapes = existingShapes.filter((shape) => {
+          let shouldKeep = true;
+          if (shape.type === "rect") {
+            shouldKeep = !(
+              mouseX >= shape.x &&
+              mouseX <= shape.x + shape.width &&
+              mouseY >= shape.y &&
+              mouseY <= shape.y + shape.height
+            );
+          } else if (shape.type === "circle") {
+            const dx = mouseX - shape.x;
+            const dy = mouseY - shape.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            shouldKeep = distance > shape.radiusX;
+          } else if (shape.type === "text") {
+            const textWidth = ctx.measureText(shape.inputText).width;
+            const textHeight = 24;
+            shouldKeep = !(
+              mouseX >= shape.x &&
+              mouseX <= shape.x + textWidth &&
+              mouseY >= shape.y - textHeight &&
+              mouseY <= shape.y
+            );
+          } else if (shape.type === "pencil") {
+            shouldKeep = !shape.points.some((point) => {
+              const dx = mouseX - point.x;
+              const dy = mouseY - point.y;
+              return Math.sqrt(dx * dx + dy * dy) < 5;
+            });
+          } else if (shape.type === "line") {
+            //@ts-ignore
+            const distanceToLine = (x, y, x1, y1, x2, y2) => {
+              const A = x - x1;
+              const B = y - y1;
+              const C = x2 - x1;
+              const D = y2 - y1;
+
+              const dot = A * C + B * D;
+              const lenSq = C * C + D * D;
+              const param = lenSq !== 0 ? dot / lenSq : -1;
+
+              let xx, yy;
+
+              if (param < 0) {
+                xx = x1;
+                yy = y1;
+              } else if (param > 1) {
+                xx = x2;
+                yy = y2;
+              } else {
+                xx = x1 + param * C;
+                yy = y1 + param * D;
+              }
+
+              const dx = x - xx;
+              const dy = y - yy;
+              return Math.sqrt(dx * dx + dy * dy);
+            };
+
+            const threshold = 10;
+            shouldKeep =
+              distanceToLine(
+                mouseX,
+                mouseY,
+                shape.x,
+                shape.y,
+                shape.endX,
+                shape.endY
+              ) > threshold;
+          }
+
+          if (!shouldKeep) {
+            socket.send(
+              JSON.stringify({
+                type: "delete",
+                message: JSON.stringify(shape),
+                roomId,
+              })
+            );
+          }
+
+          return shouldKeep;
+        });
+
+        clearCanvas(existingShapes, canvas, ctx);
       }
     }
   });
@@ -285,7 +374,7 @@ function clearCanvas(
       ctx.strokeStyle = "white";
       ctx.font = "24px Arial";
       ctx.fillStyle = "white";
-      ctx.fillText(shape.inputText, shape.startX, shape.startY);
+      ctx.fillText(shape.inputText, shape.x, shape.y);
     } else if (shape.type === "pencil") {
       if (shape.points && shape.points.length > 1) {
         ctx.strokeStyle = "rgba(255, 255, 255)";
