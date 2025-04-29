@@ -18,11 +18,12 @@ app.use(
 );
 
 app.post("/signup", async (req: Request, res: Response) => {
+  console.log("signup req");
   try {
     const SignUpBody = z.object({
       email: z.string().email(),
-      name: z.string().min(2).max(100),
       password: z.string().min(6).max(100),
+      name: z.string().min(2).max(100),
     });
     const body = SignUpBody.safeParse(req.body);
     console.log(body);
@@ -74,6 +75,7 @@ app.post(
   auth_middleWare,
   async (req: AuthRequest, res: Response) => {
     const name = req.body.name;
+    console.log("req is coming", name, req.id);
 
     try {
       if (name && req.id) {
@@ -88,6 +90,7 @@ app.post(
         res.status(400).send("room already exists with this name");
       }
     } catch (error) {
+      console.error(error);
       window.history.back();
     }
   }

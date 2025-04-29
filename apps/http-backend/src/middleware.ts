@@ -11,13 +11,22 @@ export default function auth_middleWare(
   res: Response,
   next: NextFunction
 ): void {
-  const token = req.headers.authorization ?? "";
+  console.log("auth middleware called");
+  const token = req.headers.authorization?.split(" ")[1] ?? "";
 
   try {
     if (token) {
-      const decode = jwt.verify(token, JWT_SECRET as string);
+      let decode;
+      try {
+        decode = jwt.verify(token, JWT_SECRET);
+      } catch (e) {
+        console.error(e);
+      }
+
+      console.log(decode);
       if (decode) {
         req.id = (decode as { id: string }).id;
+        console.log("id", req.id);
         next();
       }
     }

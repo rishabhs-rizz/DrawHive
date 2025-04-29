@@ -20,8 +20,8 @@ export const handleText = (
     const shape: Shape = {
       type: "text",
       inputText: text,
-      startX: startX,
-      startY: startY,
+      x: startX,
+      y: startY,
     };
     exisitedShapes.push(shape);
 
