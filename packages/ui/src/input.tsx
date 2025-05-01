@@ -1,5 +1,3 @@
-import { Button } from "./button";
-
 interface Inputprop {
   placeHolder: string;
   type?: string;

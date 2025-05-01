@@ -1,6 +1,7 @@
 import { initDraw } from "@/draw";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import TopBar from "./TopBar";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 export type Tool = "circle" | "rect" | "line" | "eraser" | "pencil" | "text";
 
@@ -13,6 +14,20 @@ export function Canvas({
 }) {
   const canvasref = useRef<HTMLCanvasElement>(null);
   const [selectedTool, SetselectedTool] = useState<Tool>("rect");
+
+  useEffect(() => {
+    toast("🦄 Joined the room ", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+    });
+  }, []);
 
   useEffect(() => {
     // @ts-ignore
@@ -28,6 +43,19 @@ export function Canvas({
 
   return (
     <div className="h-[100vh] overflow-hidden ">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
       <canvas
         ref={canvasref}
         width={window.innerWidth}

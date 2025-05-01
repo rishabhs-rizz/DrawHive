@@ -90,8 +90,7 @@ app.post(
         res.status(400).send("room already exists with this name");
       }
     } catch (error) {
-      console.error(error);
-      window.history.back();
+      console.error(error + "slug name already exists");
     }
   }
 );
