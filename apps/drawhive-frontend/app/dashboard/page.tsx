@@ -8,7 +8,7 @@ import {
 import { MainIcon } from "@/Components/MainIcon";
 import { GithubIcon, ThemeIcon, TwitterIcon } from "@/Components/ThemeIcon";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function Dashboard() {
@@ -16,11 +16,28 @@ export default function Dashboard() {
   const [isJoinModalOpen, setJoinModalOpen] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [roomId, setRoomId] = useState("");
-
-  const searchParams = useSearchParams();
-  const name = searchParams.get("name") || "guest";
-  const email = searchParams.get("email") || "email not provided";
+  const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+      setDarkMode(true);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    if (darkMode) {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    } else {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+    setDarkMode(!darkMode);
+  };
 
   return (
     <div className="min-h-screen bg-[#FFFFFF] text-black relative">
@@ -47,7 +64,9 @@ export default function Dashboard() {
               DrawHive
             </h1>
             <div className="flex items-center gap-4">
-              <ThemeIcon />
+              <span onClick={toggleTheme}>
+                <ThemeIcon />
+              </span>
               <TwitterIcon />
               <GithubIcon />
             </div>
