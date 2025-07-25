@@ -1,7 +1,7 @@
-export const MainIcon = () => (
+export const MainIcon = ({ dark }: { dark: boolean }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    fill="black"
+    fill={dark ? "#ededed" : "black"}
     version="1.1"
     id="Capa_1"
     width="30px"

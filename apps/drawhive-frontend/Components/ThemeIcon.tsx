@@ -1,9 +1,11 @@
-export const ThemeIcon = () => {
+export const ThemeIcon = ({ dark }: { dark: boolean }) => {
   return (
-    <span className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
+    <span
+      className={`p-2 rounded-full ${dark ? "hover:bg-zinc-800" : "hover:bg-gray-100"} transition-colors cursor-pointer`}
+    >
       <svg
         stroke="black"
-        fill="black"
+        fill={dark ? "#ededed" : "black"}
         stroke-width="0"
         viewBox="0 0 512 512"
         height="1em"
@@ -17,11 +19,11 @@ export const ThemeIcon = () => {
   );
 };
 
-export const TwitterIcon = () => {
+export const TwitterIcon = ({ dark }: { dark: boolean }) => {
   return (
     <svg
       stroke="black"
-      fill="black"
+      fill={dark ? "#ededed" : "black"}
       stroke-width="0"
       viewBox="0 0 512 512"
       className="cursor-pointer text-black dark:text-white"
@@ -34,11 +36,11 @@ export const TwitterIcon = () => {
   );
 };
 
-export const GithubIcon = () => {
+export const GithubIcon = ({ dark }: { dark: boolean }) => {
   return (
     <svg
       stroke="black"
-      fill="black"
+      fill={dark ? "#ededed" : "black"}
       stroke-width="0"
       viewBox="0 0 496 512"
       className="w-5 h-5 cursor-pointer text-black dark:text-white"

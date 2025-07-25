@@ -40,35 +40,35 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] text-black relative">
+    <div className="min-h-screen bg-background transition-colors duration-300 relative">
       <span className="bottom-10 right-10 absolute flex gap-2">
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="bg-[#B2AEFF] hover:bg-[#a29ef9] p-2 rounded cursor-pointer"
+          className="bg-[#B2AEFF] dark:bg-[#918cfb] hover:bg-[#a29ef9] p-2 rounded cursor-pointer"
         >
           Create Room
         </button>
         <button
           onClick={() => setJoinModalOpen(true)}
-          className="bg-[#F3F4F6] hover:bg-[#e4eaf7] p-2 rounded cursor-pointer dark:bg-lightbg "
+          className="border p-2 rounded cursor-pointer bg-background hover:bg-white/0 text-foreground transition-colors"
         >
           Join Room
         </button>
       </span>
       {/* Main Content */}
-      <header className="border-b shadow-sm">
+      <header className="border-b-black border-b shadow-sm bg-background dark:bg-background transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="flex gap-0 items-center text-2xl font-sans italic font-medium bg-background text-foreground dark:bg-background dark:text-foreground">
-              <MainIcon />
+            <h1 className="flex gap-0 items-center text-2xl font-sans italic font-medium text-foreground dark:text-foreground">
+              <MainIcon dark={darkMode} />
               DrawHive
             </h1>
             <div className="flex items-center gap-4">
               <span onClick={toggleTheme}>
-                <ThemeIcon />
+                <ThemeIcon dark={darkMode} />
               </span>
-              <TwitterIcon />
-              <GithubIcon />
+              <TwitterIcon dark={darkMode} />
+              <GithubIcon dark={darkMode} />
             </div>
           </div>
         </div>
