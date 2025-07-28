@@ -6,6 +6,8 @@ import JWT_SECRET from "@repo/common/config";
 import auth_middleWare from "./middleware";
 import { AuthRequest } from "./middleware";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -76,16 +78,28 @@ app.post(
   async (req: AuthRequest, res: Response) => {
     const name = req.body.name;
     console.log("req is coming", name, req.id);
+    const generateRandomString = (length = 10) => {
+      return Array.from(crypto.getRandomValues(new Uint8Array(length)))
+        .map((x) => ("0" + (x % 36).toString(36)).slice(-1))
+        .join("");
+    };
 
     try {
+      const link = generateRandomString();
       if (name && req.id) {
-        const room = await prisma.room.create({
+        const response = await prisma.room.create({
           data: {
             slug: name,
             adminId: req.id,
+            link,
           },
         });
-        res.json({ message: "Room created successfully", roomID: room.id });
+        console.log("this is the response of room creation" + response);
+        res.json({
+          message: "Room created successfully witht the link : ",
+          link,
+          roomID: response.id,
+        });
       } else {
         res.status(400).send("room already exists with this name");
       }
@@ -136,6 +150,24 @@ app.get(
     } catch (error) {
       console.error(error);
       res.status(400).send("Invalid room ID");
+    }
+  }
+);
+
+app.get(
+  "/allRooms",
+  auth_middleWare,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const adminId = req.id;
+      const response = await prisma.room.findMany({
+        where: {
+          adminId: adminId,
+        },
+      });
+      res.json(response);
+    } catch (e) {
+      res.json("there's a issue in getting rooms" + e);
     }
   }
 );
