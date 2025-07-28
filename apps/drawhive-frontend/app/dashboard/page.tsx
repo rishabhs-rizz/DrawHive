@@ -16,7 +16,9 @@ export default function Dashboard() {
   const [isJoinModalOpen, setJoinModalOpen] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [roomId, setRoomId] = useState("");
+  const [link, setLink] = useState("");
   const [darkMode, setDarkMode] = useState(false);
+  const [clicked, setClicked] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function Dashboard() {
         </button>
         <button
           onClick={() => setJoinModalOpen(true)}
-          className="border p-2 rounded cursor-pointer bg-background hover:bg-white/0 text-foreground transition-colors"
+          className="border p-2 rounded cursor-pointer bg-background hover:!bg-white/10 text-foreground"
         >
           Join Room
         </button>
@@ -79,7 +81,7 @@ export default function Dashboard() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white text-black rounded-lg shadow-lg p-6 w-full max-w-md relative">
               <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer"
                 onClick={() => setJoinModalOpen(false)}
               >
                 &times;
@@ -90,13 +92,12 @@ export default function Dashboard() {
               </p>
               <input
                 className="w-full px-4 py-2 border rounded mb-2"
-                placeholder="Enter room ID"
-                value={roomId}
-                onChange={(e) => setRoomId(e.target.value)}
+                placeholder="Enter the link"
+                onChange={(e) => setLink(e.target.value)}
               />
               <button
                 onClick={() => {
-                  handleJoinRoom(roomId, router);
+                  handleJoinRoom(link, roomId, router);
                   toast.success("Joining room...");
                 }}
                 className="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded"
@@ -113,7 +114,7 @@ export default function Dashboard() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white text-black rounded-lg shadow-lg p-6 w-full max-w-md relative">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer"
               onClick={() => setCreateModalOpen(false)}
             >
               &times;
@@ -132,25 +133,37 @@ export default function Dashboard() {
             <div className="flex items-center space-x-2 mb-4">
               <input
                 className="flex-1 px-4 py-2 border rounded"
-                value={roomId}
+                value={link}
                 readOnly
-                placeholder="RoomId"
+                placeholder="link"
               />
               <button
-                onClick={() => handleCopy(roomId)}
+                onClick={() => {
+                  handleCopy(link);
+                  toast.success("Copied to Clipboard!");
+                }}
                 className="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded"
               >
                 Copy
               </button>
             </div>
             <button
-              onClick={() => {
-                handleCreateRoom(roomName, setRoomId);
-                toast.success("Room created successfully!");
+              onClick={async () => {
+                setClicked(true);
+                const response = await handleCreateRoom(roomName);
+
+                if (response?.link && response.roomID) {
+                  setLink(response.link);
+                  setRoomId(response.roomID);
+                  toast.success("Room created successfully!");
+                  setClicked(false);
+                } else {
+                  toast.error("Failed to create room!");
+                }
               }}
               className="bg-black text-white px-4 py-2 rounded w-full hover:bg-gray-800"
             >
-              Create Room
+              {clicked ? "Loading..." : "Create Room"}
             </button>
             <ToastContainer />
           </div>
