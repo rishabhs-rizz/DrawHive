@@ -20,6 +20,7 @@ model User {
 model Room {
   id        Int      @id @default(autoincrement())
   slug      String   @unique // Unique name for the room
+  link      String   @unique @default(uuid())
   createdAt DateTime @default(now())
   adminId   String
   admin     User     @relation(fields: [adminId], references: [id])
