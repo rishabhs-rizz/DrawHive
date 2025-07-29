@@ -1,15 +1,12 @@
 import {
   Circle,
   Eraser,
-  LineChart,
-  Pencil,
-  PenLine,
-  RectangleHorizontal,
   Slash,
   Type,
+  Pencil,
+  RectangleHorizontal,
 } from "lucide-react";
 import { IconsButtons } from "./IconsButtons";
-import { useState } from "react";
 import { Tool } from "./Canvas";
 
 export default function TopBar({
@@ -20,61 +17,37 @@ export default function TopBar({
   SetselectedTool: (tool: Tool) => void;
 }) {
   return (
-    <div className="bg-[#232329] py-2 px-4 rounded-[10px] top-8 left-[46%] text-white fixed gap-3 flex justify-center items-center border border-gray-600">
-      {
-        <IconsButtons
-          activated={selectedTool === "pencil"}
-          icons={<Pencil />}
-          onClick={() => {
-            SetselectedTool("pencil");
-          }}
-        ></IconsButtons>
-      }
-      {
-        <IconsButtons
-          activated={selectedTool === "line"}
-          icons={<Slash />}
-          onClick={() => {
-            SetselectedTool("line");
-          }}
-        ></IconsButtons>
-      }
-      {
-        <IconsButtons
-          activated={selectedTool === "text"}
-          icons={<Type />}
-          onClick={() => {
-            SetselectedTool("text");
-          }}
-        ></IconsButtons>
-      }
-      {
-        <IconsButtons
-          activated={selectedTool === "eraser"}
-          icons={<Eraser />}
-          onClick={() => {
-            SetselectedTool("eraser");
-          }}
-        ></IconsButtons>
-      }
-      {
-        <IconsButtons
-          activated={selectedTool === "circle"}
-          icons={<Circle />}
-          onClick={() => {
-            SetselectedTool("circle");
-          }}
-        ></IconsButtons>
-      }
-      {
-        <IconsButtons
-          activated={selectedTool === "rect"}
-          icons={<RectangleHorizontal />}
-          onClick={() => {
-            SetselectedTool("rect");
-          }}
-        ></IconsButtons>
-      }
+    <div className="fixed top-8 left-1/2 -translate-x-1/2 px-5 py-2 flex items-center space-x-2 rounded-xl bg-[#2c2c32] text-white shadow-md border border-gray-700 backdrop-blur-sm">
+      <IconsButtons
+        activated={selectedTool === "pencil"}
+        icons={<Pencil size={20} />}
+        onClick={() => SetselectedTool("pencil")}
+      />
+      <IconsButtons
+        activated={selectedTool === "line"}
+        icons={<Slash size={20} />}
+        onClick={() => SetselectedTool("line")}
+      />
+      <IconsButtons
+        activated={selectedTool === "text"}
+        icons={<Type size={20} />}
+        onClick={() => SetselectedTool("text")}
+      />
+      <IconsButtons
+        activated={selectedTool === "eraser"}
+        icons={<Eraser size={20} />}
+        onClick={() => SetselectedTool("eraser")}
+      />
+      <IconsButtons
+        activated={selectedTool === "circle"}
+        icons={<Circle size={20} />}
+        onClick={() => SetselectedTool("circle")}
+      />
+      <IconsButtons
+        activated={selectedTool === "rect"}
+        icons={<RectangleHorizontal size={20} />}
+        onClick={() => SetselectedTool("rect")}
+      />
     </div>
   );
 }

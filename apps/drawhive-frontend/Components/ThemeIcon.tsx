@@ -6,7 +6,6 @@ export const ThemeIcon = ({ dark }: { dark: boolean }) => {
       <svg
         stroke="black"
         fill={dark ? "#ededed" : "black"}
-        stroke-width="0"
         viewBox="0 0 512 512"
         height="1em"
         width="1em"
@@ -24,7 +23,6 @@ export const TwitterIcon = ({ dark }: { dark: boolean }) => {
     <svg
       stroke="black"
       fill={dark ? "#ededed" : "black"}
-      stroke-width="0"
       viewBox="0 0 512 512"
       className="cursor-pointer text-black dark:text-white"
       height="1em"
@@ -41,7 +39,6 @@ export const GithubIcon = ({ dark }: { dark: boolean }) => {
     <svg
       stroke="black"
       fill={dark ? "#ededed" : "black"}
-      stroke-width="0"
       viewBox="0 0 496 512"
       className="w-5 h-5 cursor-pointer text-black dark:text-white"
       height="1em"

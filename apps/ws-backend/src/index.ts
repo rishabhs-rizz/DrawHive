@@ -5,6 +5,9 @@ import { JoinRoom } from "./JoinRoom";
 import { LeaveRoom } from "./LeaveRoom";
 import { ChatInRoom } from "./ChatInRoom";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 const wss = new WebSocketServer({ port: 8080 });
 
 function CheckUser(token: string): string | null {

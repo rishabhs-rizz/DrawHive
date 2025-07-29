@@ -99,6 +99,7 @@ app.post(
           message: "Room created successfully witht the link : ",
           link,
           roomID: response.id,
+          createdAt: response.createdAt,
         });
       } else {
         res.status(400).send("room already exists with this name");
