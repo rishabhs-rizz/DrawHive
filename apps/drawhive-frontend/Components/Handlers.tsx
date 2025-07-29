@@ -1,6 +1,7 @@
 "use client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export const handleCreateRoom = async (roomName: string) => {
   if (!roomName) return alert("Enter room name");
@@ -19,13 +20,15 @@ export const handleCreateRoom = async (roomName: string) => {
   if (response) {
     const link = response.data.link;
     const roomID = response.data.roomID;
+    const createdAt = response.data.createdAt;
     console.log("here's the link : " + link, "roomID " + roomID);
-    return { link, roomID };
+    return { link, roomID, createdAt };
   }
 };
 
 export const handleCopy = (link: string) => {
   navigator.clipboard.writeText(link);
+  toast.success("Copied to clipboard");
 };
 
 export const handleJoinRoom = async (
@@ -46,4 +49,22 @@ export const handleJoinRoom = async (
   console.log("Room data:", data);
 
   router.push(`/canvas/${roomId}`);
+  toast.success("Joining room...");
+};
+
+export const HandleFetchingAllRooms = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get("http://localhost:5000/allRooms", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response) {
+      return response;
+    }
+  } catch (e) {
+    console.log("error in fetching all rooms" + e);
+  }
 };
