@@ -1,8 +1,5 @@
-"use client";
-import { useRouter } from "next/navigation";
-import signUp from "./signup/page";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter();
-  router.push("/signup");
+  redirect("/signup");
 }

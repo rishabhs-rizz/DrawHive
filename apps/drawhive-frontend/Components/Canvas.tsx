@@ -18,7 +18,7 @@ export function Canvas({
   useEffect(() => {
     toast("🦄 Joined the room ", {
       position: "top-right",
-      autoClose: 3000,
+      autoClose: 300,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: false,

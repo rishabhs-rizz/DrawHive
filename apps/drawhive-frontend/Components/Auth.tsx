@@ -96,7 +96,7 @@ export function Authpage({ isSignin }: { isSignin: boolean }) {
                     // Show toast before navigation
                     toast("🦄 User Signed-up Successfully", {
                       position: "top-right",
-                      autoClose: 1000,
+                      autoClose: 300,
                       hideProgressBar: false,
                       closeOnClick: true,
                       pauseOnHover: false,
@@ -109,7 +109,7 @@ export function Authpage({ isSignin }: { isSignin: boolean }) {
                     // Delay navigation slightly
                     setTimeout(() => {
                       router.push("/signin");
-                    }, 1000);
+                    }, 100);
                   }
 
                   if (isSignin) {
