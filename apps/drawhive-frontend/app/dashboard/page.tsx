@@ -146,7 +146,7 @@ export default function Dashboard() {
             />
             <button
               onClick={() => {
-                handleJoinRoom(link, roomId, router);
+                handleJoinRoom(link, router);
               }}
               className="bg-black text-white px-4 py-2 rounded w-full hover:bg-gray-800"
             >

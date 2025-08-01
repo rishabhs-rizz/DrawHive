@@ -33,7 +33,6 @@ export const handleCopy = (link: string) => {
 
 export const handleJoinRoom = async (
   link: string,
-  roomId: string,
   router: ReturnType<typeof useRouter>
 ) => {
   if (!link) return alert("Enter the link");
@@ -47,7 +46,7 @@ export const handleJoinRoom = async (
   });
   const data = response.data;
   console.log("Room data:", data);
-
+  const roomId = data.id;
   router.push(`/canvas/${roomId}`);
   toast.success("Joining room...");
 };
