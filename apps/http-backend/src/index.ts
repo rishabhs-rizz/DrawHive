@@ -134,16 +134,16 @@ app.get("/chats/:roomId", async (req: AuthRequest, res: Response) => {
 });
 
 app.get(
-  "/room/:slug",
+  "/room/:link",
   auth_middleWare,
   async (req: AuthRequest, res: Response) => {
-    const slug = req.params.slug;
+    const link = req.params.link;
 
     try {
-      if (slug && req.id) {
+      if (link && req.id) {
         const requiredRoom = await prisma.room.findFirst({
           where: {
-            slug: slug,
+            link: link,
           },
         });
         res.json(requiredRoom);
